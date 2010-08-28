@@ -1,0 +1,10 @@
+{
+  'grid_spacing': 0.5,
+  'interior_probe': 1.4,
+  'surface_probe': 8.0,
+  'bfactor_probe': 0.0,
+  'res_type': 'HOH',
+  'atom_type': 'O',
+  'atom_field': 'ATOM',
+  'is_skip_waters': True
+}
