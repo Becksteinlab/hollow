@@ -294,7 +294,6 @@ def _read_chi_topology(fname):
   return chi_topology
 
 
-_module_dir = os.path.dirname(__file__)
 _chi_topology = _read_chi_topology(resource_filename(__name__, "chi.txt"))
 
 def get_res_chi_topology(res_type):
@@ -328,7 +327,7 @@ def get_n_chi(res_type):
   return len(get_res_chi_topology(res_type))
 
 
-_template = polymer.Polymer(os.path.join(_module_dir, "template.pdb"))
+_template = polymer.Polymer(resource_filename(__name__, "template.pdb"))
 template_residues = [res.type for res in _template.residues()]
 
 
