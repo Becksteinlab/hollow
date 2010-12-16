@@ -1,0 +1,14 @@
+{
+  'remove_asa_shell': False,
+  'type': 'cylinder', 
+  'radius': 16.0, 
+  'chain1': 'A', 
+  'res_num1': 318, 
+  'atom1': 'NZ', 
+  'axis_offset1': 5.0, 
+  'chain2': 'A',
+  'res_num2': 218, 
+  'atom2': 'CD', 
+  'axis_offset2': -5.0, 
+}
+

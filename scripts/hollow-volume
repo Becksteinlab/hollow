@@ -1,0 +1,46 @@
+#!/usr/bin/env python
+# coding: utf-8
+"""
+Calculates the volume of the atoms in a PDB file.
+Copyright (c) 2007 Bosco Ho.  
+
+Usage: volume.py in_pdb [spacing]
+
+-spacing    the spacing in the grid used to calculate the 
+            volume grid (default=0.5). The smaller value,
+            the more accurate, but slower.
+"""
+
+import math
+import array
+from hollow import pdbstruct
+from hollow.volume import volume
+
+def load_psyco_if_in_system():
+  try:
+    import psyco
+    psyco.full()
+    print "Loaded optional psyco JIT compiler"
+  except:
+    pass
+
+
+if __name__ == "__main__":
+  import sys
+  usage = __doc__
+  if len(sys.argv) < 2:
+    print usage
+    sys.exit(1)
+
+  spacing = 0.5
+  if len(sys.argv) > 2:
+    spacing = float(sys.argv[2])
+    
+  load_psyco_if_in_system()
+  
+  mol = pdbstruct.Molecule(sys.argv[1])
+  atoms = mol.atoms()
+  pdbstruct.add_radii(atoms)
+
+  print "%d atoms in input pdb file" % len(atoms)
+  volume(atoms, spacing, sys.argv[1].replace('.pdb', '.grid.pdb'))

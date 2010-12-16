@@ -1,0 +1,4 @@
+include README COPYING INSTALL
+include setup.py ez_setup.py 
+graft examples
+

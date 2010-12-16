@@ -1,0 +1,43 @@
+========================
+ Installation of hollow
+========================
+
+1) Install psyco through your package manager.
+
+2) Install the hollow package::
+
+      python setup.py install --user
+
+   It will want to install three scripts into a script directory; you
+   might have to set it appropriately with option
+   ``--install-scripts``; I use ``~/bin`` for this purpose.
+
+   See ``python setup.py install --help`` for help on using setuptools
+   ("easy_install").
+
+
+The installation procedure will make three scripts available: See the
+web site
+
+  http://hollow.sourceforge.net
+
+the README, and the examples to learn how to use ``hollow``.
+
+
+hollow
+   The program that creates the cavity pdb file.
+
+hollow-volume
+   Calculates the volume of a structure.
+
+hollow-asa
+   Calculates the surface are of a structure.
+
+
+.. Note:: Oliver Beckstein repackaged the original hollow 1.1
+   distribution so that it can be installed in the standard python
+   fashion. Thus examples on the website might work a little bit
+   differently when using this installation (e.g. you don't have to
+   say ``python hollow.py ...``). If you have problems with the
+   installation then try installing and using the zip file from the
+   website (*hollow.zip*) first. 

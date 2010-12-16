@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+
+"""
+Routines to calculate the Accessible Surface Area of a set of atoms.
+The algorithm is adapted from the Rose lab's chasa.py, which uses
+the dot density technique found in:
+
+Shrake, A., and J. A. Rupley. "Environment and Exposure to Solvent
+of Protein Atoms. Lysozyme and Insulin." JMB (1973) 79:351-371.
+"""
+
+from hollow import pdbstruct
+from hollow.asa import calculate_asa
+
+if __name__ == "__main__":
+  usage = \
+  """
+
+  Copyright (c) 2007 Bosco Ho
+  
+  Calculates the total Accessible Surface Area (ASA) of atoms in a 
+  PDB file. 
+
+  Usage: asa.py -n n_sphere in_pdb [out_pdb]
+  
+  - out_pdb    PDB file in which the atomic ASA values are written 
+               to the b-factor column.
+               
+  -n n_sphere  number of points used in generating the spherical
+               dot-density for the calculation (default=960). The 
+               more points, the more accurate (but slower) the 
+               calculation. 
+
+  """
+  import sys
+  import getopt
+  opts, args = getopt.getopt(sys.argv[1:], "n:")
+
+  if len(args) == 0:
+    print usage
+    sys.exit(1)
+    
+  mol = pdbstruct.Molecule(args[0])
+  atoms = mol.atoms()
+  pdbstruct.add_radii(atoms)
+
+  n_sphere = 960
+  for o, a in opts:
+    if '-n' in o:
+      n_sphere = int(a)
+      print "Points on sphere: ", n_sphere
+
+  asas = calculate_asa(atoms, 1.4, n_sphere)
+  print "%.1f angstrom squared." % sum(asas)
+
+  if len(args) > 1:
+    for asa, atom in zip(asas, atoms):
+      atom.bfactor = asa
+    mol.write_pdb(args[1])
+
+    
