@@ -1,5 +1,6 @@
 # setuptools installation of Hollow
-# Written by Oliver Beckstein [2010]; cast into the Public Domain...
+# setup.py written by Oliver Beckstein [2010]
+# ... and cast into the Public Domain...
 
 from ez_setup import use_setuptools
 use_setuptools()
