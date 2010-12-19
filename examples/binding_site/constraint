@@ -1,0 +1,8 @@
+{
+  'remove_asa_shell': False,
+  'type': 'sphere', 
+  'radius': 12.0, 
+  'chain1': 'A', 
+  'res_num1': 384, 
+  'atom1': 'CD1', 
+}
