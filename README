@@ -80,6 +80,24 @@ Here's a sample cylinder constraint file:
 
 For the cylinder constraint, 'chain1' 'res1' and 'atom1' refers to the center of the one end of the cylinder, whilst 'chain2' 'res2' 'atom2' refers to the center at the other end of the cylinder. The length of the cylinder is inferred from the inter-atomic distance between these two atoms. The 'axis_offset1' and 'axis_offset2' allows the length of the cylinder to be adjusted along the cylinder aixs.
 
+It is also possible to add a 'brick' (or 'box') constraint [added by OB in 1.1-ob1]:
+
+ {
+    'type': 'brick',	
+    'remove_asa_shell': False,   # True or False
+
+    # lower left front corner of the orthorhombic box
+    'chain1': 'F',              
+    'res_num1': 57,             
+    'atom1': 'CE1',             
+    'offset1': (0,0,-5.0),     # extend in z direction
+                                
+    # upper right back corner
+    'chain2': 'G',              
+    'res_num2': 185,            
+    'atom2': 'CA',              
+    'offset2': (-5,0,10),      # shrink in x and extend in z
+ }   
 
 
 # Default options

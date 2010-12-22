@@ -7,7 +7,7 @@
 
 __all__ = ["make_hollow_spheres"]
 
-__version__ = "1.1"
+__version__ = "1.1-ob1"
 
 # this import ensures that the IDLE examples still work as documented
 from core import make_hollow_spheres, help

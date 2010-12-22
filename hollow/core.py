@@ -310,6 +310,13 @@ def get_cylinder_constraint_fn(center1, center2, radius):
   
   return cylinder_constraint_fn
 
+def get_brick_constraint_fn(lower_left_front, upper_right_back):
+  """Constraint to be within in a orthorhombic box."""
+  lo = lower_left_front
+  hi = upper_right_back
+  def brick_constraint_fn(pos):
+    return lo.x < pos.x < hi.x and lo.y < pos.y < hi.y and lo.z < pos.z < hi.z
+  return brick_constraint_fn
 
 def print_time(timer):
   print "   >>>>>", timer.str().split()[1]
@@ -436,8 +443,31 @@ def make_hollow_spheres(
       radius = radius - border_length
       inner_constraint_fn = get_cylinder_constraint_fn(
           center1, center2, radius)
+    elif constraints.type in ("brick", "box"):
+      atom1 = find_atom(
+          atoms, constraints.chain1, constraints.res_num1, 
+          constraints.atom1)
+      atom2 = find_atom(
+          atoms, constraints.chain2, constraints.res_num2, 
+          constraints.atom2)
+      try:
+        offset1 = vector3d.Vector3d(*constraints.offset1)
+      except AttributeError:
+        offset1 = vector3d.Vector3d(0,0,0)
+      try:
+        offset2 = vector3d.Vector3d(*constraints.offset2)
+      except AttributeError:
+        offset2 = vector3d.Vector3d(0,0,0)
+      lower_left_front_corner = atom1.pos + offset1
+      upper_right_back_corner = atom2.pos + offset2
+      diagonal = vector3d.pos_distance(lower_left_front_corner, upper_right_back_corner)
+      width = diagonal + 2.0*grid_spacing
+      center = lower_left_front_corner + upper_right_back_corner
+      center.scale(0.5)
+      constraint_fn = get_brick_constraint_fn(lower_left_front_corner, upper_right_back_corner)
+      inner_constraint_fn = constraint_fn
     else:
-      raise "Don't understand constraint type"
+      raise "Don't understand constraint type %r" % constraint.type
 
   # Make the grid
   n_point = width / grid_spacing
