@@ -285,8 +285,8 @@ def find_atom(atoms, chain, res_num, atom_type):
       and atom.res_num == res_num \
       and atom.type == atom_type:
       return atom
-  raise "Can't find '%s' atom %s of res %d" \
-          % (chain, atom_type, res_num)
+  raise ValueError("Can't find '%s' atom %s of res %d" \
+          % (chain, atom_type, res_num))
 
 
 def get_sphere_constraint_fn(center, radius):
@@ -467,7 +467,7 @@ def make_hollow_spheres(
       constraint_fn = get_brick_constraint_fn(lower_left_front_corner, upper_right_back_corner)
       inner_constraint_fn = constraint_fn
     else:
-      raise "Don't understand constraint type %r" % constraint.type
+      raise TypeError("Don't understand constraint type %r" % constraint.type)
 
   # Make the grid
   n_point = width / grid_spacing

@@ -71,7 +71,7 @@ def _project_prev_c_ca(protein, i):
   would have been precedent to residue i.
   """
   if "ACE" in protein.residue(i).type:
-    raise ValueError, "Can't project in N-terminal direction from ACE"
+    raise ValueError("Can't project in N-terminal direction from ACE")
 
   if "NME" in protein.residue(i).type:
     ca_type = "CH3"
@@ -150,7 +150,7 @@ def _get_n_peptide(protein, i):
 
 def _project_next_n_ca(protein, i):
   if "NME" in protein.residue(i).type:
-    raise ValueError, "Cant' project in C-terminal direction from NME"
+    raise ValueError("Cant' project in C-terminal direction from NME")
 
   if "ACE" in protein.residue(i).type:
     ca_type = "CH3"
@@ -320,7 +320,7 @@ def calculate_chi(residue, j):
     p = [residue.atom(atom_type).pos for atom_type in res_chi_topology[j]]
     angle = vector3d.pos_dihedral(p[0], p[1], p[2], p[3])
     return vector3d.normalize_angle(angle)
-  raise ValueError, "No Chi%d angle for res %d" % (j, i)
+  raise ValueError("No Chi%d angle for res %d" % (j, i))
 
 
 def get_n_chi(res_type):
@@ -335,7 +335,7 @@ def ResidueFromType(res_type):
   for res in _template.residues():
     if res_type == res.type:
       return res.copy()
-  raise ValueError, "Don't have template for %s", res_type
+  raise ValueError("Don't have template for %s", res_type)
 
 
 
@@ -379,16 +379,16 @@ class Protein(polymer.Polymer):
             for atom_type in _chi_topology[res.type][j]]
         angle = vector3d.pos_dihedral(p[0], p[1], p[2], p[3])
         return vector3d.normalize_angle(angle)
-    raise ValueError, "No Chi%d angle for res %s-%d" % (j, res.type, i)
+    raise ValueError("No Chi%d angle for res %s-%d" % (j, res.type, i))
 
   def set_chi(self, i, j, chi):
     res = self.residue(i)
 
     if "PRO" in res.type:
-      raise ValueError, "Can't do chi of PRO"
+      raise ValueError("Can't do chi of PRO")
 
     if j < 0 or j >= len(_chi_topology[res.type]):
-      raise ValueError, "Residue doesn't have this chi"
+      raise ValueError("Residue doesn't have this chi")
 
     p = [res.atom(atom_type).pos
          for atom_type in _chi_topology[res.type][j]]
@@ -405,7 +405,7 @@ class Protein(polymer.Polymer):
 
   def phi(self, i):
     if "ACE" in self.residue(i).type:
-      raise ValueError, "Can't calculate phi of ACE"
+      raise ValueError("Can't calculate phi of ACE")
 
     if i == 0:
       if "PRO" in self.residue(i).type:
@@ -415,7 +415,7 @@ class Protein(polymer.Polymer):
       elif self.residue(i).has_atom("H1"):
         atoms = [(i, "H1"), (i, "N"), (i, "CA"), (i, "C")]
       else:
-        raise ValueError, "Can't find atoms to calculate phi"
+        raise ValueError("Can't find atoms to calculate phi")
     else:
       if "ACE" in self.residue(i-1).type:
         atoms = [(i-1, "CH3"), (i, "N"), (i, "CA"), (i, "C")]
@@ -427,7 +427,7 @@ class Protein(polymer.Polymer):
 
   def psi(self, i):
     if "NME" in self.residue(i).type:
-      raise ValueError, "Can't calculate psi of NME"
+      raise ValueError("Can't calculate psi of NME")
 
     if i < self.n_residue() - 1:
       p1 = self.residue(i).atom("N").pos
@@ -447,7 +447,7 @@ class Protein(polymer.Polymer):
   def set_phi(self, i, phi):
     res = self.residue(i)
     if "ACE" in res.type:
-      raise ValueError, "Can't calculate phi of ACE"
+      raise ValueError("Can't calculate phi of ACE")
 
     if "NME" in res.type:
       anchor = res.atom("CH3").pos
@@ -474,7 +474,7 @@ class Protein(polymer.Polymer):
     res = self.residue(i)
 
     if "NME" in res.type:
-      raise ValueError, "Can't calculate phi of NME"
+      raise ValueError("Can't calculate phi of NME")
 
     if "ACE" in res.type:
       anchor = res.atom("CH3").pos
