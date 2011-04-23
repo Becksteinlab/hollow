@@ -3,7 +3,6 @@
 import math
 import random
 
-
 RAD2DEG = 180.0 / math.pi
 DEG2RAD = math.pi / 180.0
 SMALL = 1E-6
@@ -81,7 +80,7 @@ class Vector3d:
     if is_near_zero(axis_len):
       result = self
     else:
-      result = axis.scaled_vec(dot(self, axis) 
+      result = axis.scaled_vec(dot(self, axis)
                / axis.length() / axis.length())
     return result
 
@@ -277,9 +276,9 @@ class Matrix3d:
     for i in range(0, 3):
       for j in range(0, 3):
         if abs(self.elem(i,j) - rhs.elem(i,j)) > SMALL:
-	      return False
+              return False
     return True
-	
+
   def __mul__(self, rhs):
     c = Matrix3d()
     for i in range(0, 3):

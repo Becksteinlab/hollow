@@ -23,6 +23,9 @@ import os
 import array
 import sys
 
+# should really make it use numpy throughout... [orbeckst]
+import numpy
+
 # hollow modules
 import util, pdbtext, vector3d, pdbstruct, asa
 
@@ -41,11 +44,11 @@ class BaseGrid:
     self.n_cube = self.n_sq * self.n
     for i in xrange(self.n_cube):
       self.array.append(0)
-  
+
   def is_set(self, i, j, k):
     l = i*self.n_sq + j*self.n + k
     return self.array[l] > 0
-    
+
   def set(self, i, j , k, is_state):
     l = i*self.n_sq + j*self.n + k
     if is_state:
@@ -53,7 +56,7 @@ class BaseGrid:
     else:
       self.array[l] = 0
 
-    
+
 class Grid:
   def __init__(self, grid_spacing, width, center):
     self.center = center
@@ -71,17 +74,17 @@ class Grid:
     self.drilled = BaseGrid(self.n)
     self.is_drilled = self.drilled.is_set
     self.set_drilled = self.drilled.set
-    
-    self.x = [self.center.x + (i-self.half_n)*self.spacing 
+
+    self.x = [self.center.x + (i-self.half_n)*self.spacing
               for i in xrange(self.n)]
-    self.y = [self.center.y + (i-self.half_n)*self.spacing 
+    self.y = [self.center.y + (i-self.half_n)*self.spacing
               for i in xrange(self.n)]
-    self.z = [self.center.z + (i-self.half_n)*self.spacing 
+    self.z = [self.center.z + (i-self.half_n)*self.spacing
               for i in xrange(self.n)]
 
   def is_excluded_or_drilled(self, i, j, k):
     return self.is_excluded(i, j, k) or self.is_drilled(i, j, k)
-    
+
   def indices(self, pos):
     return \
        ((pos.x-self.center.x)*self.inv_spacing + self.half_n,
@@ -93,14 +96,14 @@ class Grid:
 
   def is_grid_point_near_sphere(self, i, j, k, pos, r_sq):
     d_x = self.x[i] - pos.x
-    d_y = self.y[j] - pos.y 
+    d_y = self.y[j] - pos.y
     d_z = self.z[k] - pos.z
     return d_x*d_x + d_y*d_y + d_z*d_z < r_sq
-    
+
   def int_range(self, low_f, high_f):
     low = max(0, int(math.floor(low_f)))
     high = min(self.n, int(math.ceil(high_f)) + 1)
-    return range(low, high)
+    return xrange(low, high)
 
   def exclude_sphere(self, pos, r):
     r_sq = r*r
@@ -124,7 +127,7 @@ class Grid:
       return k, i, j
 
   def drill_in_dim(self, is_reversed, i, j, dim):
-    drill_range = range(self.n)
+    drill_range = xrange(self.n)
     if is_reversed:
       drill_range.reverse()
     for k in drill_range:
@@ -134,20 +137,20 @@ class Grid:
       self.set_drilled(a, b, c, True)
 
   def exclude_edge_to_interior(self):
-    for i in range(self.n):
-      for j in range(self.n):
+    for i in xrange(self.n):
+      for j in xrange(self.n):
         self.drill_in_dim(True,  i, j, 0)
         self.drill_in_dim(False, i, j, 0)
         self.drill_in_dim(True,  i, j, 1)
         self.drill_in_dim(False, i, j, 1)
         self.drill_in_dim(True,  i, j, 2)
         self.drill_in_dim(False, i, j, 2)
-          
+
   def is_surrounded(self, i, j, k):
     indices_list = [ \
-        (i,j,k), 
-        (i+1,j,k), (i-1,j,k), 
-        (i,j+1,k), (i,j-1,k), 
+        (i,j,k),
+        (i+1,j,k), (i-1,j,k),
+        (i,j+1,k), (i,j-1,k),
         (i,j,k-1), (i,j,k+1)]
     for (a, b, c) in indices_list:
       if 0 <= a < self.n and 0 <= b < self.n and 0 <= c < self.n:
@@ -157,9 +160,9 @@ class Grid:
 
   def exclude_surrounded(self, skip):
     surrounded_grid_points = []
-    for i in range(self.n):
-      for j in range(self.n):
-        for k in range(self.n):
+    for i in xrange(self.n):
+      for j in xrange(self.n):
+        for k in xrange(self.n):
           if self.is_surrounded(i,j,k):
             surrounded_grid_points.append([i,j,k])
     for (i,j,k) in surrounded_grid_points:
@@ -169,9 +172,9 @@ class Grid:
       self.set_excluded(i, j, k, True)
 
   def exclude_points_in_constraint(self, constraint_fn):
-    for i in range(self.n):
-      for j in range(self.n):
-        for k in range(self.n):
+    for i in xrange(self.n):
+      for j in xrange(self.n):
+        for k in xrange(self.n):
           if not self.is_excluded_or_drilled(i, j, k):
             if not constraint_fn(self.pos(i,j,k)):
               self.set_excluded(i, j, k, True)
@@ -183,9 +186,9 @@ class Grid:
       if not c.isdigit() and c != " ":
         element += c
     i_res = 1
-    for i in range(self.n):
-      for j in range(self.n):
-        for k in range(self.n):
+    for i in xrange(self.n):
+      for j in xrange(self.n):
+        for k in xrange(self.n):
           if not (self.is_excluded_or_drilled(i,j,k)):
             hollow_atom = pdbstruct.Atom()
             hollow_atom.pos = self.pos(i,j,k)
@@ -202,7 +205,7 @@ class Grid:
 def exclude_atoms_from_grid(grid, atoms, probe):
   for atom in atoms:
     grid.exclude_sphere(atom.pos, atom.radius + probe)
-  
+
 
 def exclude_surface(grid, atoms, probe):
   test_point = vector3d.Vector3d()
@@ -219,8 +222,8 @@ def exclude_surface(grid, atoms, probe):
         test_point.x = point[0]*radius + atom_i.pos.x
         test_point.y = point[1]*radius + atom_i.pos.y
         test_point.z = point[2]*radius + atom_i.pos.z
-        cycled_indices = range(j_closest_neighbor, n_neighbor)
-        cycled_indices.extend(range(j_closest_neighbor))
+        cycled_indices = xrange(j_closest_neighbor, n_neighbor)
+        cycled_indices.extend(xrange(j_closest_neighbor))
         for j in cycled_indices:
           atom_j = atoms[neighbor_indices[j]]
           r = atom_j.radius + probe
@@ -234,7 +237,7 @@ def exclude_surface(grid, atoms, probe):
         if is_point_accessible:
           grid.exclude_sphere(test_point, probe)
 
-  
+
 def calculate_average_bfactor(
     grid_chain, protein_atoms, bfactor_probe):
   max_bfactor = 0.0
@@ -252,7 +255,7 @@ def calculate_average_bfactor(
     n_bfactor = len(bfactors)
     if n_bfactor == 0:
       grid_atom.bfactor = max_bfactor
-    else:              
+    else:
       grid_atom.bfactor = sum(bfactors)/float(n_bfactor)
 
 
@@ -260,7 +263,7 @@ def add_asa(atoms, probe):
   areas = asa.calculate_asa(atoms, probe)
   for area, atom in zip(areas, atoms):
     atom.asa = area
-    
+
 
 def get_molecule(pdb):
   txt = open(pdb, 'r').read()
@@ -291,8 +294,8 @@ def find_atom(atoms, chain, res_num, atom_type):
 
 def get_sphere_constraint_fn(center, radius):
   return lambda pos: vector3d.pos_distance(center, pos) <= radius
-  
-  
+
+
 def get_cylinder_constraint_fn(center1, center2, radius):
   axis12 = center2 - center1
 
@@ -303,11 +306,11 @@ def get_cylinder_constraint_fn(center1, center2, radius):
     pos1_perp = pos1.perpendicular_vec(axis12)
     if pos1_perp.length() > radius:
       return False
-    pos2 = pos - center2  
+    pos2 = pos - center2
     if vector3d.dot(pos2, axis12) > 0:
       return False
     return True
-  
+
   return cylinder_constraint_fn
 
 def get_brick_constraint_fn(lower_left_front, upper_right_back):
@@ -323,13 +326,13 @@ def print_time(timer):
 
 
 def make_hollow_spheres(
-    pdb, 
-    out_pdb="", 
+    pdb,
+    out_pdb="",
     grid_spacing=defaults.grid_spacing,
     size_interior_probe=defaults.interior_probe,
     is_skip_waters=defaults.is_skip_waters,
-    size_surface_probe=defaults.surface_probe, 
-    constraint_file="", 
+    size_surface_probe=defaults.surface_probe,
+    constraint_file="",
     size_bfactor_probe=defaults.bfactor_probe):
   """Generate spheres that fill the void in structure *pdb*.
 
@@ -381,7 +384,7 @@ def make_hollow_spheres(
 
   For further help, type ``hollow.help()`` and read the README file in the
   distribution or see the online documentation at http://hollow.sourceforge.net/.
-  """ 
+  """
 
   # load protein and get protein parameters
   print "Loading", pdb
@@ -402,7 +405,7 @@ def make_hollow_spheres(
     constraints = util.read_parameters(constraint_file)
     if constraints.type == 'sphere':
       atom1 = find_atom(
-          atoms, constraints.chain1, constraints.res_num1, 
+          atoms, constraints.chain1, constraints.res_num1,
           constraints.atom1)
       radius = constraints.radius
       constraint_fn = get_sphere_constraint_fn(atom1.pos, radius)
@@ -410,12 +413,14 @@ def make_hollow_spheres(
       width = 2.0*constraints.radius + 2.0*grid_spacing
       radius = radius - 3.0*grid_spacing
       inner_constraint_fn = get_sphere_constraint_fn(atom1.pos, radius)
+      print "%s constraints: center = %r, radius = %g" % \
+          (constraints.type, center, constraints.radius)
     elif constraints.type == 'cylinder':
       atom1 = find_atom(
-          atoms, constraints.chain1, constraints.res_num1, 
+          atoms, constraints.chain1, constraints.res_num1,
           constraints.atom1)
       atom2 = find_atom(
-          atoms, constraints.chain2, constraints.res_num2, 
+          atoms, constraints.chain2, constraints.res_num2,
           constraints.atom2)
       axis12 = atom2.pos - atom1.pos
 
@@ -443,12 +448,14 @@ def make_hollow_spheres(
       radius = radius - border_length
       inner_constraint_fn = get_cylinder_constraint_fn(
           center1, center2, radius)
+      print "%s constraints: center = %r, axis = %r, radius = %g" % \
+          (constraints.type, center, axis12, constraints.radius)
     elif constraints.type in ("brick", "box"):
       atom1 = find_atom(
-          atoms, constraints.chain1, constraints.res_num1, 
+          atoms, constraints.chain1, constraints.res_num1,
           constraints.atom1)
       atom2 = find_atom(
-          atoms, constraints.chain2, constraints.res_num2, 
+          atoms, constraints.chain2, constraints.res_num2,
           constraints.atom2)
       try:
         offset1 = vector3d.Vector3d(*constraints.offset1)
@@ -458,14 +465,30 @@ def make_hollow_spheres(
         offset2 = vector3d.Vector3d(*constraints.offset2)
       except AttributeError:
         offset2 = vector3d.Vector3d(0,0,0)
-      lower_left_front_corner = atom1.pos + offset1
-      upper_right_back_corner = atom2.pos + offset2
+
+      p1 = atom1.pos + offset1
+      p2 = atom2.pos + offset2
+
+      # true lower-left-front ("min") and upper-right-back ("max")
+      def toarray(v):
+        return numpy.array([v.x, v.y, v.z])
+
+      p1 = toarray(p1)
+      p2 = toarray(p2)
+
+      pmin = numpy.where(p1 < p2, p1, p2)
+      pmax = numpy.where(p1 < p2, p2, p1)
+      lower_left_front_corner = vector3d.Vector3d(*pmin)
+      upper_right_back_corner = vector3d.Vector3d(*pmax)
+
       diagonal = vector3d.pos_distance(lower_left_front_corner, upper_right_back_corner)
       width = diagonal + 2.0*grid_spacing
       center = lower_left_front_corner + upper_right_back_corner
       center.scale(0.5)
       constraint_fn = get_brick_constraint_fn(lower_left_front_corner, upper_right_back_corner)
-      inner_constraint_fn = constraint_fn
+      inner_constraint_fn = constraint_fn   # XXX should be reduced in size
+      print "%s constraints: loleftfr = %r uprightbk = %r" % \
+          (constraints.type, lower_left_front_corner, upper_right_back_corner)
     else:
       raise TypeError("Don't understand constraint type %r" % constraint.type)
 
@@ -481,7 +504,7 @@ def make_hollow_spheres(
   timer.start()
   exclude_atoms_from_grid(grid, atoms, size_interior_probe)
   print_time(timer)
-  
+
   if constraint_file:
     # Eliminate all grid points outside constraints
     print "Excluding grid points outside constraint"
@@ -529,7 +552,7 @@ def make_hollow_spheres(
     timer.start()
     if constraint_file:
       atoms = [a for a in atoms if constraint_fn(a.pos)]
-    calculate_average_bfactor(grid_chain, atoms, size_bfactor_probe)  
+    calculate_average_bfactor(grid_chain, atoms, size_bfactor_probe)
     print_time(timer)
   if constraint_file:
     for atom in grid_chain.atoms():
@@ -540,12 +563,14 @@ def make_hollow_spheres(
   is_hetatm = not defaults.atom_field.startswith("ATOM")
   pdbstruct.save_atoms(grid_chain.atoms(), out_pdb, is_hetatm)
 
+  return grid
+
 # monkey-patch the defaults into the doc string
 make_hollow_spheres.__doc__ = make_hollow_spheres.__doc__ % defaults.__dict__
 
 idle_help_txt = """
   ----------------------
-  
+
   If you see this message, then you are probably trying to run
   hollow.py using the IDLE interpreter.
 
@@ -566,12 +591,12 @@ idle_help_txt = """
   If you want to choose your own output hollow filename:
 
     >>> hollow.make_hollow_spheres('3hbs.pdb','hollow.pdb')
-  
+
   If you want to use a cylinder constraint file or a spherical
   constraint file, then run the command using the following parameters:
 
     >>> hollow.make_hollow_spheres('3hbs.pdb', constraint_file='constraint')
-  
+
   To change the grid spacing:
 
     >>> hollow.make_hollow_spheres('3hbs.pdb', grid_spacing=0.5)
@@ -581,13 +606,13 @@ idle_help_txt = """
 
 definition_str = """
    make_hollow_spheres(
-      pdb, 
-      out_pdb="", 
+      pdb,
+      out_pdb="",
       grid_spacing=%f,
       size_interior_probe=%f,
       is_skip_waters=%s,
-      size_surface_probe=%f, 
-      constraint_file="", 
+      size_surface_probe=%f,
+      constraint_file="",
       size_bfactor_probe=%f)
   """ % \
   (defaults.grid_spacing, defaults.interior_probe,
@@ -596,8 +621,8 @@ definition_str = """
 
 
 function_txt = """
-  Only the first parameter is required, all other parameters have 
-  default values. To override the default values, just replace them 
+  Only the first parameter is required, all other parameters have
+  default values. To override the default values, just replace them
   in order up to the ones you want to replace, such as:
 
     >>> hollow.make_hollow_spheres('3hbs.pdb', 'hollow.pdb',
@@ -611,4 +636,4 @@ function_txt = """
 
 def help():
   print idle_help_txt, definition_str, function_txt
-  
+

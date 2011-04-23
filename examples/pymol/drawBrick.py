@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-                                                                      
+# -*- coding: utf-8 -*-
 # Copyright (c) 2011 Oliver Beckstein
 # Placed into the Public Domain
 # NO WARRANTY
@@ -34,7 +34,7 @@ import numpy
 
 def read_parameters(fname):
     # hollow.util.read_parameters
-    class DataHolder: 
+    class DataHolder:
         pass
     f = open(fname, 'r')
     try:
@@ -55,7 +55,7 @@ def box(lower_left, upper_right, linewidth=2, rgb=None):
     minX, minY, minZ = lower_left
     maxX, maxY, maxZ = upper_right
     if rgb is None:
-        r,g,b = (1., 1., 1.)    
+        r,g,b = (1., 1., 1.)
     else:
         r,g,b = str2array(rgb)
     return [
@@ -63,48 +63,48 @@ def box(lower_left, upper_right, linewidth=2, rgb=None):
 
         BEGIN, LINES,
         COLOR, r, g, b,
-        
+
         VERTEX, minX, minY, minZ,       #1
         VERTEX, minX, minY, maxZ,       #2
-        
+
         VERTEX, minX, maxY, minZ,       #3
         VERTEX, minX, maxY, maxZ,       #4
-        
+
         VERTEX, maxX, minY, minZ,       #5
         VERTEX, maxX, minY, maxZ,       #6
-        
+
         VERTEX, maxX, maxY, minZ,       #7
         VERTEX, maxX, maxY, maxZ,       #8
-        
- 
+
+
         VERTEX, minX, minY, minZ,       #1
         VERTEX, maxX, minY, minZ,       #5
- 
+
         VERTEX, minX, maxY, minZ,       #3
         VERTEX, maxX, maxY, minZ,       #7
- 
+
         VERTEX, minX, maxY, maxZ,       #4
         VERTEX, maxX, maxY, maxZ,       #8
- 
+
         VERTEX, minX, minY, maxZ,       #2
         VERTEX, maxX, minY, maxZ,       #6
-        
- 
+
+
         VERTEX, minX, minY, minZ,       #1
         VERTEX, minX, maxY, minZ,       #3
-        
+
         VERTEX, maxX, minY, minZ,       #5
         VERTEX, maxX, maxY, minZ,       #7
-        
+
         VERTEX, minX, minY, maxZ,       #2
         VERTEX, minX, maxY, maxZ,       #4
-        
+
         VERTEX, maxX, minY, maxZ,       #6
         VERTEX, maxX, maxY, maxZ,       #8
-        
+
         END
         ]
- 
+
 def get_selection_first_coord(sel, name="(sel)"):
     """Return *first* coordinate of selection"""
 
@@ -126,12 +126,12 @@ def drawBrick(res_num1, atom1, res_num2, atom2, **kwargs):
     res_num1, atom1 - lower left
     res_num2, atom2 - upper right
 
-    OPTIONAL 
-    
+    OPTIONAL
+
     chain1, chain2  - defaults to "A"
 
     offset1         - add to lower left front (0,0,0)
-    offset2         - add to upper right back; default (0,0,0)   
+    offset2         - add to upper right back; default (0,0,0)
 
     rgb             - line colour, e.g (1,1,1) for white
     linewidth       - width of box lines
@@ -146,14 +146,20 @@ def drawBrick(res_num1, atom1, res_num2, atom2, **kwargs):
 
     boxname = kwargs.pop("boxname", "brick")
     selname = kwargs.pop("name", "(sel)")
-    lower_left =  get_selection_first_coord("%(chain1)s/`%(res_num1)d/%(atom1)s" % vars(), selname)
-    upper_right = get_selection_first_coord("%(chain2)s/`%(res_num2)d/%(atom2)s" % vars(), selname)
+    p1 = get_selection_first_coord("%(chain1)s/`%(res_num1)d/%(atom1)s" % vars(), selname)
+    p2 = get_selection_first_coord("%(chain2)s/`%(res_num2)d/%(atom2)s" % vars(), selname)
 
     #print "lower_left: %r" % lower_left
     #print "offset1:    %r" % offset1
 
-    lower_left  += offset1
-    upper_right += offset2
+    p1 += offset1
+    p2 += offset2
+
+    lower_left = numpy.where(p1 < p2, p1, p2)
+    upper_right = numpy.where(p1 < p2, p2, p1)
+
+    print "--> lower left front corner: %(lower_left)r" % vars()
+    print "--> upper right back corner: %(upper_right)r" % vars()
 
     boxCGO = box(lower_left, upper_right, **kwargs)
     cmd.load_cgo(boxCGO, boxname)
