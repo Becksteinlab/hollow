@@ -146,8 +146,8 @@ def drawBrick(res_num1, atom1, res_num2, atom2, **kwargs):
 
     boxname = kwargs.pop("boxname", "brick")
     selname = kwargs.pop("name", "(sel)")
-    p1 = get_selection_first_coord("%(chain1)s/`%(res_num1)d/%(atom1)s" % vars(), selname)
-    p2 = get_selection_first_coord("%(chain2)s/`%(res_num2)d/%(atom2)s" % vars(), selname)
+    p1 = get_selection_first_coord("///%(chain1)s/`%(res_num1)d/%(atom1)s" % vars(), selname)
+    p2 = get_selection_first_coord("///%(chain2)s/`%(res_num2)d/%(atom2)s" % vars(), selname)
 
     #print "lower_left: %r" % lower_left
     #print "offset1:    %r" % offset1
