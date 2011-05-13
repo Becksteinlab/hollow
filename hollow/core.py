@@ -129,7 +129,7 @@ class Grid:
   def drill_in_dim(self, is_reversed, i, j, dim):
     drill_range = xrange(self.n)
     if is_reversed:
-      drill_range.reverse()
+      drill_range = reversed(drill_range)
     for k in drill_range:
       a, b, c = self.permutation(i, j, k, dim)
       if self.is_excluded(a, b, c):
@@ -222,8 +222,8 @@ def exclude_surface(grid, atoms, probe):
         test_point.x = point[0]*radius + atom_i.pos.x
         test_point.y = point[1]*radius + atom_i.pos.y
         test_point.z = point[2]*radius + atom_i.pos.z
-        cycled_indices = xrange(j_closest_neighbor, n_neighbor)
-        cycled_indices.extend(xrange(j_closest_neighbor))
+        cycled_indices = range(j_closest_neighbor, n_neighbor)
+        cycled_indices.extend(range(j_closest_neighbor))
         for j in cycled_indices:
           atom_j = atoms[neighbor_indices[j]]
           r = atom_j.radius + probe
