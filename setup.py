@@ -37,7 +37,7 @@ In complements programs such as HOLE, CAVER, MOLE, SPHGEN, and CASTp.
                  "scripts/hollow-asa",
                  "scripts/hollow-volume",
                  ],
-      install_requires=['psyco'],  # psyco is really optional...
+      #install_requires=['psyco'],  # psyco is really optional...
       zip_safe = True,
 )
 
