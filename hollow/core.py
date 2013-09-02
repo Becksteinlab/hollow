@@ -415,6 +415,19 @@ def make_hollow_spheres(
       inner_constraint_fn = get_sphere_constraint_fn(atom1.pos, radius)
       print "%s constraints: center = %r, radius = %g" % \
           (constraints.type, center, constraints.radius)
+    elif constraints.type == 'coordsphere':
+      try:
+        coord = vector3d.Vector3d(*constraints.coord)
+      except AttributeError:
+        coord = vector3d.Vector3d(0,0,0)
+      radius = constraints.radius
+      constraint_fn = get_sphere_constraint_fn(coord, radius)
+      center = coord
+      width = 2.0*constraints.radius + 2.0*grid_spacing
+      radius = radius - 3.0*grid_spacing
+      inner_constraint_fn = get_sphere_constraint_fn(coord, radius)
+      print "%s constraints: center = %r, radius = %g" % \
+          (constraints.type, center, constraints.radius)
     elif constraints.type == 'cylinder':
       atom1 = find_atom(
           atoms, constraints.chain1, constraints.res_num1,
@@ -431,6 +444,43 @@ def make_hollow_spheres(
       offset2 = axis12.normal_vec()
       offset2.scale(constraints.axis_offset2)
       center2 = atom2.pos + offset2
+
+      center = center1 + center2
+      center.scale(0.5)
+      radius = constraints.radius
+      constraint_fn = get_cylinder_constraint_fn(
+          center1, center2, radius)
+
+      half_length = vector3d.pos_distance(center, center1)
+      width = 2.0 * grid_spacing + 2.0 * \
+                math.sqrt(half_length*half_length \
+                  + constraints.radius*constraints.radius)
+      border_length = 3.0*grid_spacing
+      center1 = center1 + axis12.normal_vec().scaled_vec(border_length)
+      center2 = center2 - axis12.normal_vec().scaled_vec(border_length)
+      radius = radius - border_length
+      inner_constraint_fn = get_cylinder_constraint_fn(
+          center1, center2, radius)
+      print "%s constraints: center = %r, axis = %r, radius = %g" % \
+          (constraints.type, center, axis12, constraints.radius)
+    elif constraints.type == 'coordcylinder':
+      try:
+        coord1 = vector3d.Vector3d(*constraints.coord1)
+      except AttributeError:
+        coord1 = vector3d.Vector3d(0,0,0)
+      try:
+        coord2 = vector3d.Vector3d(*constraints.coord2)
+      except AttributeError:
+        coord2 = vector3d.Vector3d(0,0,0)
+      axis12 = coord2 - coord1
+
+      offset1 = -axis12.normal_vec()
+      offset1.scale(constraints.axis_offset1)
+      center1 = coord1 + offset1
+
+      offset2 = axis12.normal_vec()
+      offset2.scale(constraints.axis_offset2)
+      center2 = coord2 + offset2
 
       center = center1 + center2
       center.scale(0.5)
@@ -481,14 +531,46 @@ def make_hollow_spheres(
       lower_left_front_corner = vector3d.Vector3d(*pmin)
       upper_right_back_corner = vector3d.Vector3d(*pmax)
 
-      diagonal = vector3d.pos_distance(lower_left_front_corner, upper_right_back_corner)
-      width = diagonal + 2.0*grid_spacing
+      longest_side = max(pmax - pmin) 
+      width = longest_side + 2.0*grid_spacing
       center = lower_left_front_corner + upper_right_back_corner
       center.scale(0.5)
       constraint_fn = get_brick_constraint_fn(lower_left_front_corner, upper_right_back_corner)
       inner_constraint_fn = constraint_fn   # XXX should be reduced in size
       print "%s constraints: loleftfr = %r uprightbk = %r" % \
           (constraints.type, lower_left_front_corner, upper_right_back_corner)
+    elif constraints.type in ('coordbrick', 'coordbox'):
+      try:
+        coord1 = vector3d.Vector3d(*constraints.coord1)
+      except AttributeError:
+        coord1 = vector3d.Vector3d(0,0,0)
+      try:
+        coord2 = vector3d.Vector3d(*constraints.coord2)
+      except AttributeError:
+        coord2 = vector3d.Vector3d(0,0,0)
+      p1 = coord1
+      p2 = coord2
+      # true lower-left-front ("min") and upper-right-back ("max")
+      def toarray(v):
+        return numpy.array([v.x, v.y, v.z])
+
+      p1 = toarray(p1)
+      p2 = toarray(p2)
+
+      pmin = numpy.where(p1 < p2, p1, p2)
+      pmax = numpy.where(p1 < p2, p2, p1)
+      lower_left_front_corner = vector3d.Vector3d(*pmin)
+      upper_right_back_corner = vector3d.Vector3d(*pmax)
+
+      longest_side = max(pmax - pmin)
+      width = longest_side + 2.0*grid_spacing
+      center = lower_left_front_corner + upper_right_back_corner
+      center.scale(0.5)
+      constraint_fn = get_brick_constraint_fn(lower_left_front_corner, upper_right_back_corner)
+      inner_constraint_fn = constraint_fn   # XXX should be reduced in size
+      print "%s constraints: loleftfr = %r uprightbk = %r" % \
+          (constraints.type, lower_left_front_corner, upper_right_back_corner)
+
     else:
       raise TypeError("Don't understand constraint type %r" % constraint.type)
 
