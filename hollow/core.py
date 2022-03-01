@@ -621,7 +621,7 @@ def make_hollow_spheres(
   print "Excluding surrounded points"
   timer.start()
   hole_size = int(1.5 * 1.4 / grid_spacing)
-  #grid.exclude_surrounded(hole_size)
+  #grid.exclude_surrounded(hole_size) 
   print_time(timer)
 
   # Make hollow spheres from grid-points
