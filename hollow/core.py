@@ -333,8 +333,8 @@ def make_hollow_spheres(
     is_skip_waters=defaults.is_skip_waters,
     size_surface_probe=defaults.surface_probe,
     constraint_file="",
-    is_hollow=defaults.is_hollow
-    size_bfactor_probe=defaults.bfactor_probe):
+    size_bfactor_probe=defaults.bfactor_probe,
+    is_hollow=defaults.is_hollow):
   """Generate spheres that fill the void in structure *pdb*.
 
   make_hollow_spheres(pdb[,out_pdb,grid_spacing,size_interior_probe,is_skip_waters,size_surface_probe,constraint_file,size_bfactor_probe])
@@ -623,10 +623,12 @@ def make_hollow_spheres(
   timer.start()
   hole_size = int(1.5 * 1.4 / grid_spacing)
 
+
+  print 'is_hollow has been set to: %s' % is_hollow
   if is_hollow == 'yes':
     grid.exclude_surrounded(hole_size)
   elif is_hollow == 'no':
-    continue
+    pass
   else:
     raise ValueError('Please enter yes or no for the is_hollow option.')
   print_time(timer)
