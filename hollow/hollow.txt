@@ -7,5 +7,5 @@
   'atom_type': 'O',
   'atom_field': 'ATOM',
   'is_skip_waters': True,
-  'is_hollow': 'yes'
+  'is_hollow': True
 }
