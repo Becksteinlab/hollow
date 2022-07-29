@@ -333,6 +333,7 @@ def make_hollow_spheres(
     is_skip_waters=defaults.is_skip_waters,
     size_surface_probe=defaults.surface_probe,
     constraint_file="",
+    is_hollow=defaults.is_hollow
     size_bfactor_probe=defaults.bfactor_probe):
   """Generate spheres that fill the void in structure *pdb*.
 
@@ -621,7 +622,13 @@ def make_hollow_spheres(
   print "Excluding surrounded points"
   timer.start()
   hole_size = int(1.5 * 1.4 / grid_spacing)
-  #grid.exclude_surrounded(hole_size) 
+
+  if is_hollow == 'yes':
+    grid.exclude_surrounded(hole_size)
+  elif is_hollow == 'no':
+    continue
+  else:
+    raise ValueError('Please enter yes or no for the is_hollow option.')
   print_time(timer)
 
   # Make hollow spheres from grid-points

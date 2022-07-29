@@ -6,5 +6,6 @@
   'res_type': 'HOH',
   'atom_type': 'O',
   'atom_field': 'ATOM',
-  'is_skip_waters': True
+  'is_skip_waters': True,
+  'is_hollow': 'yes'
 }
