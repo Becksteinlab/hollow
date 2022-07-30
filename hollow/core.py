@@ -624,11 +624,9 @@ def make_hollow_spheres(
   hole_size = int(1.5 * 1.4 / grid_spacing)
 
 
-  print 'is_hollow has been set to: %r' % is_hollow
+  print 'is_hollow (hollow -i commandline option) has been set to: %r' % is_hollow
   if is_hollow:
     grid.exclude_surrounded(hole_size)
-  else:
-    pass
   print_time(timer)
 
   # Make hollow spheres from grid-points
