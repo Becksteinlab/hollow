@@ -28,6 +28,7 @@ if __name__ == "__main__":
   """ % __version__
 
   parser = optparse.OptionParser(usage="usage: %prog [options] pdb")
+  
   parser.add_option(
       "-g", dest="grid_spacing", type="float", 
       help="grid spacing in angstroms " \
@@ -66,6 +67,14 @@ if __name__ == "__main__":
         + " b-factors of heavy atoms are averaged (0.0=off;" \
         + " suggested=4.0; default=%.f)" % defaults.bfactor_probe,
       default=defaults.bfactor_probe)
+  parser.add_option(
+      "-i", dest="is_hollow",  action='store_false' ,
+      help="Enable/disable the grid.exclude_surrounded " \
+        + "default is True"  \
+          "exclude_surrounded will eliminate all grid points" \
+          "that are surrounded by other points."
+        + "switch to False if one wants interior filled grid",
+      default=True)
 
 
   options, args = parser.parse_args()                
@@ -88,5 +97,6 @@ if __name__ == "__main__":
         not options.process_waters,
         options.surface_probe,
         options.constraint_file,
-        options.bfactor_probe)  
+        options.bfactor_probe,
+        options.is_hollow,)  
                       
