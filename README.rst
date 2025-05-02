@@ -16,11 +16,19 @@ Hollow generates fake atoms that identifies voids, pockets, channels and depress
 
 There are two effective modes to run this program: an automated mode that explicitly deduces the molecular surface, and a constrained mode that works in a pre-specified volume.
 
-To see the options, type in the command line::
+To see the options, install and type in the command line::
   
-  python hollow.py
-  
-The program requires Python 2.4 or higher. **It does NOT work with Python 3** so it is recommended to install it into a Python 2.7 environment.
+  hollow --help
+
+Installation
+------------
+
+The program requires Python 2.4 or higher. **It does NOT work with Python 3** so it is recommended to install it into a Python 2.7 environment::
+
+   mamba create -n hollow27 python=2.7
+   python setup.py install
+
+
 
 Documentation
 -------------
