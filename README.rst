@@ -1,30 +1,41 @@
-
-
 ===================================================
  Hollow 1.1 (c) 2009.  Bosco Ho and Franz Gruswitz 
 ===================================================
 
+Note: This is a fork of the original (now defunct) SourceForge repository of the hollow code. It contains modifications. It is **not maintained**.
+
+Please cite:
+
+* Bosco K. Ho and Franz Grusewitz. HOLLOW: Generating accurate representations of channel and interior surfaces in molecular structures. *BMC Struct Biol*, **8** (49), 2008. doi: `10.1186/1472-6807-8-49`_. 
+
+.. _`10.1186/1472-6807-8-49`: https://doi.org/10.1186/1472-6807-8-49
+
+----
 
 Hollow generates fake atoms that identifies voids, pockets, channels and depressions in a protein structure specified in the PDB format. 
 
 There are two effective modes to run this program: an automated mode that explicitly deduces the molecular surface, and a constrained mode that works in a pre-specified volume.
 
-To see the options, type in the command line: 
+To see the options, type in the command line::
   
   python hollow.py
   
-The program requires Python 2.4 or higher. 
+The program requires Python 2.4 or higher. **It does NOT work with Python 3** so it is recommended to install it into a Python 2.7 environment.
+
+Documentation
+-------------
+
+**Note**: The links below are no longer functional. Some of the information is in the `examples directory`_ of this repository.
 
 Please refer to the website for illustrated tutorials:
 
-  1) The interior pathways of myoglobin:
-       http://hollow.sourceforge.net/myoglobin.html.
+1. The interior pathways of myoglobin:        http://hollow.sourceforge.net/myoglobin.html
+2. The channel surface of a phosphate porin:      http://hollow.sourceforge.net/channel.html
 
-  2) The channel surface of a phosphate proin:
-       http://hollow.sourceforge.net/channel.html.
+.. _`examples directory`: https://github.com/Becksteinlab/hollow/tree/master/examples
 
-
-# Automated Surface Detection Mode
+Automated Surface Detection Mode
+--------------------------------
 
 In the automated (also the default) mode, a grid is constructed over the entire protein. To analyze large proteins, due to the large size of the resultant grid, use only coarse grid spacings of 1.0 angstroms or 0.5 angstroms. 
 
@@ -33,7 +44,8 @@ The automated mode requires several intermediate calculations. The Accessible Su
 
 
 
-# Constrained Mode
+Constrained Mode
+----------------
 
 In the constrained mode, either a sphere or a cylinder is specified in a separate file. Grid points are constructed within these constraints, and thus, there is no need for the costly calculation that sweeps over the entire surface. 
 
@@ -41,8 +53,8 @@ The point of having a constrained mode is that once you identify an interior reg
 
 We also label the occupancy with 1.0 if the sphere is within the accessible surface of the protein, otherwise we label the occupancy with 0.0 if the sphere is outside the accessible surface of the protein. This allows the visualization of funnel-like surfaces for channel proteins.
 
-Here's a sample spherical constraint file. The format is a Python dictionary:
-
+Here's a sample spherical constraint file. The format is a Python dictionary::
+  
   {
     'type': 'sphere',          # 'cylinder' or 'sphere'
     'remove_asa_shell': True,  # True or False
@@ -59,8 +71,8 @@ The boolean value 'remove_asa_shell' tells the program whether we want to do the
 
 The atom around which the spherical constraint is centered is denoted by 'chain1', 'res_num1' and 'atom1'. 
 
-Here's a sample cylinder constraint file:
-
+Here's a sample cylinder constraint file::
+  
   {
     'type': 'cylinder',          # 'cylinder' or 'sphere'
     'remove_asa_shell': False,   # True or False
@@ -80,8 +92,8 @@ Here's a sample cylinder constraint file:
 
 For the cylinder constraint, 'chain1' 'res1' and 'atom1' refers to the center of the one end of the cylinder, whilst 'chain2' 'res2' 'atom2' refers to the center at the other end of the cylinder. The length of the cylinder is inferred from the inter-atomic distance between these two atoms. The 'axis_offset1' and 'axis_offset2' allows the length of the cylinder to be adjusted along the cylinder aixs.
 
-It is also possible to add a 'brick' (or 'box') constraint [added by OB in 1.1-ob1]:
-
+It is also possible to add a 'brick' (or 'box') constraint [added by OB in 1.1-ob1]::
+ 
  {
     'type': 'brick',	
     'remove_asa_shell': False,   # True or False
@@ -97,13 +109,28 @@ It is also possible to add a 'brick' (or 'box') constraint [added by OB in 1.1-o
     'res_num2': 185,            
     'atom2': 'CA',              
     'offset2': (-5,0,10),      # shrink in x and extend in z
+ }
+
+and there's also a 'coordbrick' option::
+ 
+ {
+    'type': 'coordbrick',	
+    'remove_asa_shell': False,   # True or False
+
+    # lower left front corner of the orthorhombic box
+    'coord1': (-49.275047, -23.634737, -32.318233),
+                                
+    # upper right back corner
+    'coord2': (49.35033417, 23.93759727, 38.40119743),
  }   
 
 
-# Default options
+
+Default options
+---------------
   
-Default values for various parameters are stored in hollow.txt. If you use the program a lot, you might want to fine tune these options.
-                        
+Default values for various parameters are stored in hollow.txt. If you use the program a lot, you might want to fine tune these options.::
+
   {
     'grid_spacing': 1.0,
     'interior_probe': 1.444,
@@ -126,27 +153,31 @@ Three other options are also given, and these relate to the chemistry of the fak
 
 
 
-# Atomic radii
+Atomic radii
+------------
   
 In order to calculate the accessible surface area, we need the atomic radii. In the program, a set of standard atomic radii are read from the radii.txt. Edit this file to add or change radii for different elements. If the element is not defined, we give it a default of 1.8 angstroms (identified as element '.' in the radii.txt).
 
 
 
-# B-factors
+B-factors
+---------
 
 We also calculate appropriate B-factors of every fake atom, by averaging over the heavy protein atoms around each fake atom. This is controlled by the command-line option 'BFACTOR_PROBE'.
 
 
 
-# Works with PyMol
+Works with PyMol
+----------------
 
 We developed this program with output designed to be easily viewed and manipulated with PyMol, an open-source protein viewer. By default, the hollow spheres are stored with the "ATOM" field as water oxygen molecules. Pymol can draw the molecular surface of overlapping fake water molecules as it interprets "ATOM" as if the atoms belong to a pseudo polymer.
 
 
 
-# Use in IDLE
+Use in IDLE
+-----------
 
-Hollow can also be imported as a PYTHON module. This allows hollow to be used in the PYTHON command-line, for example:
+Hollow can also be imported as a PYTHON module. This allows hollow to be used in the PYTHON command-line, for example::
 
    import hollow
    hollow.make_hollow_spheres(
@@ -155,7 +186,7 @@ Hollow can also be imported as a PYTHON module. This allows hollow to be used in
       grid_spacing=0.1, 
       constraint_file="my_constraint")
   
-the parameters to the make_hollow_spheres function are:
+the parameters to the make_hollow_spheres function are::
 
   def make_hollow_spheres(
       pdb, 
