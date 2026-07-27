@@ -2,6 +2,8 @@
  Hollow 1.1 (c) 2009.  Bosco Ho and Franz Gruswitz 
 ===================================================
 
+The successor to the original *hollow* is called **pdbstruct** and is available from https://github.com/boscoh/pdbstruct . 
+
 Note: This is a fork of the original (now defunct) SourceForge repository of the hollow code. It contains modifications. It is **not maintained**.
 
 Please cite:
